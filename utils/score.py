@@ -3,10 +3,7 @@
 # Utilities to calculate scores and fetch new words
 #
 
-import re
-
-# global reference wordlist
-reference_wordlist = create_reference_wordlist('../data/corpusrank.txt')
+import re, operator
 
 class Word:
     """
@@ -49,12 +46,38 @@ def create_reference_wordlist(fname):
 
     return d
 
+# global reference wordlist
+reference_wordlist = create_reference_wordlist('../data/corpusrank.txt')
+
 def unique_words(string):
     """
     Returns list of unique (case insensitive) strings from a string.
     """
     return list(set(re.findall("[a-z]+", string.lower())))
 
-def get_score(wordlist):
-    pass
+def filter_words(wordlist):
+    """
+    Remove words we don't have in our dictionary
+    """
+    return [word for word in wordlist if word in reference_wordlist]
 
+def score_wordlist_percentile(wordlist):
+    """
+    Score user based on list of unique words in wordlist. Percentile approach.
+    """
+    percentile = 0.67
+    d = reference_wordlist
+    sorted_words = sorted(filter_words(wordlist), \
+        key = lambda x: d.get(x).rank, reverse=True)
+    threshold_word = sorted_words[ int( (1 - percentile) * len(sorted_words))]
+    score = float( d[threshold_word].rank ) / len(d)
+    return score
+
+
+def test_on_textfile(fname):
+    """
+    Loads text file and estimates number of words in vocabulary.
+    """
+    wl = filter_words( unique_words( open(fname, 'r').read()))
+    return score_wordlist_percentile(wl) * len(reference_wordlist)
+    
