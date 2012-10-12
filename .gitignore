@@ -30,5 +30,8 @@ pip-log.txt
 *.sublime-project
 *.sublime-workspace
 
+# vim
+*.swp
+
 #Admin
 AWS.md
