@@ -25,7 +25,9 @@ def login_callback():
         print "Successfully acquired an authentication token"
         credentials = flow.step2_exchange(request.query.code)
         storage.put(credentials)
-        http = credentials.authorize(httplib2.Http())
+        print "Stored credentials"
+        redirect('/')
+        # http = credentials.authorize(httplib2.Http())
 
 flow = flow_from_clientsecrets('config/client_secrets.json',
                                scope='https://mail.google.com/',
