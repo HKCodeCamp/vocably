@@ -83,9 +83,17 @@ def store_user_words(email,words):
         for word in words:
             query = 'INSERT INTO Vocab VALUES("'
             query += email + '","' + word + '");'
-            cur.execute(query)
+            try:
+                cur.execute(query)
+            except sqlite3.IntegrityError:
+                pass
 
 def wipe_db():
+
+    if not os.path.isfile("vocably.db"):
+        print "The database is not there to begin with!"
+        return
+    
     msg = "Are you 100% sure you want to wipe the database?\n"
     msg += "This will remote all data and is irreversible... (yes/no)\n"
     input_ = raw_input(msg).strip().lower()
@@ -105,6 +113,7 @@ def test():
     create_user("test@user.com",0.3726)
     set_score("test2@user.com",0.9999)
     store_user_words("test@user.com",['helicopter','giraffe','heteroskedasticity'])
+    store_user_words("test@user.com",['computer','giraffe','fantastic'])
     print get_list('test@user.com')
     print get_score('test2@user.com')
     print get_score('test3@user.com')
