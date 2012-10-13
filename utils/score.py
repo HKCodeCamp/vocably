@@ -14,7 +14,7 @@ sorted_reference_wordlist = []
 
 def percentile(): return 0.8
 def words_in_language(): return len(reference_wordlist)
-def wordlist_filename(): return "../data/corpusrank.txt"
+def wordlist_filename(): return "data/corpusrank.txt"
 
 class Word:
     """
@@ -28,8 +28,8 @@ def create_reference_wordlist(fname):
     """
     d = create_dict(fname) create dictionary: d[word] = Word
 
-    creates dict based on table of word occurences and normalizes it 
-    
+    creates dict based on table of word occurences and normalizes it
+
     rank: Word.rank
     frequency: Word.frequency
 
@@ -82,14 +82,14 @@ def score_wordlist_percentile(wordlist):
     Score user based on list of unique words in wordlist. Percentile approach.
     """
     d = reference_wordlist
-    
+
     # sort words, reverse for performance
     sorted_words = sorted(filter_words(wordlist), \
         key = lambda x: d.get(x).rank, reverse=True)
-    
+
     threshold_word = sorted_words[ int( (1 - percentile()) * len(sorted_words))]
     score = float( d[threshold_word].rank ) / words_in_language()
-    
+
     return score
 
 def score(wordlist):
@@ -117,7 +117,7 @@ def test_on_textfile(fname):
 
 def choose_words(userid, nwords_to_send = 10):
     """
-    Choose words for user to learn. 
+    Choose words for user to learn.
     """
     # query database for known words of user
     userwords = database.get_list(userid)
@@ -126,7 +126,7 @@ def choose_words(userid, nwords_to_send = 10):
     userscore = database.get_score(userid)
 
     target = int(percentile() * userscore)
-    
+
     # add a word not yet known to user to wordlist (ugly solution)
     def add_word(target,wordlist):
         tries = 0
@@ -134,27 +134,27 @@ def choose_words(userid, nwords_to_send = 10):
             candidate = int(target * (1.0 + random.random() \
                 * (1 - percentile())))
             tries += 1
-            if candidate > words_in_language() + 1: 
+            if candidate > words_in_language() + 1:
                 continue
-            word = sorted_reference_wordlist[candidate] 
-            if word not in wordlist:         
+            word = sorted_reference_wordlist[candidate]
+            if word not in wordlist:
                 return wordlist + [word]
-        
+
         # can't find suitable words, giving up
         return None
 
     wordlist = []
-    
+
     for i in range(nwords_to_send):
         wordlist = add_word(target,wordlist)
-    
+
     return wordlist
 
 
 def initialize_module():
     global reference_wordlist
     global sorted_reference_wordlist
-    
+
     reference_wordlist = create_reference_wordlist(wordlist_filename())
     sorted_reference_wordlist = sorted(reference_wordlist,
             key=lambda x: reference_wordlist.get(x).freq, reverse=True)
