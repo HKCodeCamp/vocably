@@ -3,7 +3,7 @@
 # Utilities to calculate scores and fetch new words
 #
 
-import re, random
+import re, random, enchant
 import database
 
 # global reference dictionary
@@ -26,12 +26,10 @@ class Word:
 
 def create_reference_wordlist(fname):
     """
-    d = create_dict(fname) create dictionary: d[word] = Word
-
     creates dict based on table of word occurences and normalizes it 
     
-    rank: Word.rank
-    frequency: Word.frequency
+    keys are word strings
+    values are Word class with members Word.rank Word.frequency
 
     fname is of the form:
     rank1 occurences1 word1
@@ -44,12 +42,18 @@ def create_reference_wordlist(fname):
         for i in d:
             d[i].freq /= count
 
-    d=dict()
+    d = dict()
+    en_dict = enchant.Dict("en_GB")
+
     f = open(fname,'r')
     for line in f.readlines():
         data = line.split()
         try:
-            d[data[2]] = Word(int(data[0]),float(data[1]));
+            word = data[2]
+            # add word if in dictionary
+            if en_dict.check(word) and word.isalpha():
+                d[word] = Word(int(data[0]),float(data[1]))
+
         except:
             continue
 
@@ -92,11 +96,16 @@ def score_wordlist_percentile(wordlist):
     
     return score
 
-def score(wordlist):
+def score(data):
     """
-    Scores user based on wordlist.
+    Scores based on list of words or one string.
     """
-    return score_wordlist_percentile(wordlist)
+    if type(data) is type('str'):
+        return score_wordlist_percentile(filter_words(unique_words(data)))
+    elif type(data) is type([]):
+        return score_wordlist_percentile(data)
+    else: 
+        return None
 
 
 def test_on_textfile(fname):
@@ -125,7 +134,7 @@ def choose_words(userid, nwords_to_send = 10):
     # query database for user score
     userscore = database.get_score(userid)
 
-    target = int(percentile() * userscore)
+    target = int(percentile() * userscore * words_in_language())
     
     # add a word not yet known to user to wordlist (ugly solution)
     def add_word(target,wordlist):
@@ -140,16 +149,31 @@ def choose_words(userid, nwords_to_send = 10):
             if word not in wordlist:         
                 return wordlist + [word]
         
-        # can't find suitable words, giving up
-        return None
+        # can't find unknown words, returning whatever I have
+        return wordlist + [word]
 
     wordlist = []
     
     for i in range(nwords_to_send):
         wordlist = add_word(target,wordlist)
-    
+   
+    database.store_user_words(userid, wordlist)
+    newscore = score(wordlist + userwords)
+    database.set_score(newscore)
+
     return wordlist
 
+def score_user(email, text):
+    """
+    Score a new user based on text User is assumed to be in database.
+    """
+    wordlist = filter_words(unique_words(text))
+    userscore = score(wordlist)
+    print(wordlist)
+    database.store_user_words(email, wordlist)
+    database.set_score(email, userscore)
+
+    return userscore
 
 def initialize_module():
     global reference_wordlist
