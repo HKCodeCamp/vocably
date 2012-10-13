@@ -25,7 +25,7 @@ class Word:
     """
     Word class
     """
-    def __init__(self, rank,freq):
+    def __init__(self, rank, freq):
         self.rank = rank
         self.freq = freq
 
@@ -110,7 +110,7 @@ def score(data):
     """
     Scores based on list of words or one string.
     """
-    if isinstance(data, type('str')):
+    if isinstance(data, type('')):
         return score_wordlist_percentile(filter_words(unique_words(data)))
     elif isinstance(data, type([])):
         return score_wordlist_percentile(data)
@@ -125,64 +125,54 @@ def test_on_textfile(fname):
     wl = filter_words(unique_words( open(fname, 'r').read()))
     return score(wl) * words_in_language()
 
-
-# some testing functions
-#def get_list(a):
-#    return unique_words( open("../data/m.txt", 'r').read() )
-#
-#def get_score(a):
-#    return test_on_textfile("../data/m.txt")
-
-
-def choose_words(userid, nwords_to_send = 10):
+def choose_words(email, nwords_to_send = 10):
     """
-    Choose words for user to learn. 
+    Choose nwords_to_send words for user to learn. If less words are available
+    only the available words will be sent.
+    Words chosen will be assumed to be learned by user and are added to the
+    user vocabulary in the db. User score in db is updated.
     """
     # query database for known words of user
-    userwords = database.get_list(userid)
+    userwords = database.get_list(email)
+
+    # create complete dict and remove known words
+    unknown_words = reference_wordlist.copy()
+    for w in userwords:
+        unknown_words.pop(w,0)
+ 
+    # convert unknown words dict to sorted list
+    unknown_words = sorted(unknown_words,
+            key=lambda x: unknown_words.get(x).freq, reverse=True)
+
+    # at best we can send all the unknown words
+    nwords_to_send = min(nwords_to_send, len(unknown_words))
 
     # query database for user score
-    userscore = database.get_score(userid)
+    userscore = database.get_score(email)
 
-    target = int(percentile() * userscore * words_in_language())
-    
-    # add a word not yet known to user to wordlist (ugly solution)
-    def add_word(target, wordlist):
-        tries = 0
-        while tries < 1000:
-            candidate = int(target * (1.0 + random.random() \
-                * (1 - percentile())))
-            tries += 1
-            if candidate > words_in_language() + 1: 
-                continue
-            word = sorted_reference_wordlist[candidate] 
-            if word not in wordlist:         
-                return wordlist + [word]
-        
-        # can't find unknown words, returning whatever I have
-        return wordlist + [word]
+    def add_word():
+        target = int(percentile() * userscore * len(unknown_words))
+        candidate = int(target * (1 + random.random() * (1 - percentile())))
+        candidate = min(candidate, len(unknown_words) - 1)
+        return unknown_words.pop(candidate)
 
-    wordlist = []
-    
-    for i in range(nwords_to_send):
-        wordlist = add_word(target, wordlist)
+    wordlist = [add_word() for i in range(nwords_to_send)]
    
-    database.store_user_words(userid, wordlist)
+    database.store_user_words(email, wordlist)
     newscore = score(wordlist + userwords)
-    database.set_score(userid, newscore)
+    database.set_score(email, newscore)
 
     return wordlist
 
 def score_user(email, text):
     """
-    Score a new user based on text User is assumed to be in database.
+    Score a new user based on text. User is assumed to be in database.
     """
     wordlist = filter_words(unique_words(text))
     userscore = score(wordlist)
-    print(wordlist)
     database.store_user_words(email, wordlist)
     database.set_score(email, userscore)
-
+    print 'User %s knows %i words' % (email, userscore * words_in_language())
     return userscore
 
 def get_score(email):
