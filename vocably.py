@@ -11,8 +11,8 @@ def home():
 def words():
     # Get words for user
     # word_defs = get_word_defs()
-    # newwords = score.choose_words(oauth.user_email())
-    newwords = ['grinder','helicopter','fab']
+    newwords = score.choose_words(oauth.user_email())
+    # newwords = ['grinder','helicopter','fab']
     word_defs = {w:definition.definition(w) for w in newwords}
     output = template('words', word_defs=word_defs)
     return output
@@ -43,9 +43,8 @@ def login_callback():
 def fetch_mail():
     email_text = oauth.fetch_mail()
     print "Got a bunch of email text"
-    print email_text
 
-    # score.score_user(oauth.user_email(), email_text)
+    score.score_user(oauth.user_email(), email_text)
 
     # Process big string here
     redirect('/words')
