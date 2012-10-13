@@ -1,5 +1,5 @@
 from bottle import route, run, debug, template, request, static_file, redirect
-from utils import vocably_oauth as oauth, score, definition
+from utils import vocably_oauth as oauth, score, definition, database
 
 # Landing Page
 @route('/')
@@ -10,7 +10,7 @@ def home():
 @route('/words')
 def words():
     # Get words for user
-    # word_defs = get_word_defs() 
+    # word_defs = get_word_defs()
     # newwords = score.choose_words(oauth.user_email())
     newwords = ['grinder','helicopter','fab']
     word_defs = {w:definition.definition(w) for w in newwords}
@@ -36,6 +36,7 @@ def login_callback():
     else:
         print "Successfully acquired an authentication token"
         oauth.authorize(request.query.code)
+        database.create_user(oauth.user_email(), 0)
         redirect('/emails')
 
 @route('/emails')

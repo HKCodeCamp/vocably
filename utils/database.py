@@ -14,7 +14,7 @@ def setup_db():
     con = sqlite3.connect('vocably.db')
 
     with con:
-        cur = con.cursor()    
+        cur = con.cursor()
 
         cur.execute("SELECT * FROM sqlite_master WHERE type='table' AND name='Users';")
         rows = cur.fetchall()
@@ -68,7 +68,7 @@ def get_score(email):
     con = sqlite3.connect('vocably.db')
 
     with con:
-        cur = con.cursor()    
+        cur = con.cursor()
         query = 'SELECT score FROM Users WHERE email="'+email+'";'
         cur.execute(query)
         rows = cur.fetchall()
@@ -78,7 +78,7 @@ def store_user_words(email,words):
     con = sqlite3.connect('vocably.db')
 
     with con:
-        cur = con.cursor()    
+        cur = con.cursor()
 
         for word in words:
             query = 'INSERT INTO Vocab VALUES("'
@@ -93,7 +93,7 @@ def wipe_db():
     if not os.path.isfile("vocably.db"):
         print "The database is not there to begin with!"
         return
-    
+
     msg = "Are you 100% sure you want to wipe the database?\n"
     msg += "This will remote all data and is irreversible... (yes/no)\n"
     input_ = raw_input(msg).strip().lower()
