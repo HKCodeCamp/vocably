@@ -175,6 +175,9 @@ def score_user(email, text):
 
     return userscore
 
+def get_score(email):
+    return int( database.get_score(email) * words_in_language() )
+
 def initialize_module():
     global reference_wordlist
     global sorted_reference_wordlist
