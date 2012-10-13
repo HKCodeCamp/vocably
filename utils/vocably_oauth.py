@@ -9,6 +9,8 @@ from oauth2client.file import Storage
 import imaplib, json
 from urllib import urlopen, urlencode
 
+import score
+
 def initialize_module():
     global flow, storage
     flow = flow_from_clientsecrets('config/client_secrets.json',
@@ -39,9 +41,12 @@ def fetch_mail():
 
     # Pull email bodies
     resp, data = imap_conn.search(None, 'ALL')
+    email_text = ""
     for num in data[0].split():
         resp, body = imap_conn.fetch(num, '(BODY[TEXT])')
+        email_text += body
         print 'Message %s\n%s\n' % (num, body[0][1])
+    return email_text
 
 def deauthorize():
     if imap_conn:

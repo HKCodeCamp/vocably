@@ -30,8 +30,9 @@ def login_callback():
 
 @route('/emails')
 def fetch_mail():
-    oauth.fetch_mail()
-    redirect('/')
+    email_text = oauth.fetch_mail()
+    # Process big string here
+    redirect('/words')
 
 # Static Files
 @route('/css/:path#.+#', name='css')
