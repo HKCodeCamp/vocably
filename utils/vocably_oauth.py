@@ -45,7 +45,6 @@ def fetch_mail():
     for num in data[0].split():
         resp, body = imap_conn.fetch(num, '(BODY[TEXT])')
         email_text += body[0][1]
-        print 'Message %s\n%s\n' % (num, body[0][1])
     return email_text
 
 def deauthorize():

@@ -36,6 +36,8 @@ def login_callback():
 @route('/emails')
 def fetch_mail():
     email_text = oauth.fetch_mail()
+    print "Got a bunch of email text"
+    print email_text
     # Process big string here
     redirect('/words')
 
