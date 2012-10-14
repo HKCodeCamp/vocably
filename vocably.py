@@ -8,14 +8,18 @@ def home():
     output = template('home')
     return output
 
-@route('/words')
-def words():
+@route('/words.json')
+def wordsdict():
     # Get words for user
-    # word_defs = get_word_defs() 
     user_email = oauth.user_email()
     newwords = score.choose_words(user_email)
     word_defs = {w:definition.definition(w) for w in newwords}
-    output = template('words', word_defs=word_defs)
+    #word_defs = {"word1":"def1", "word2":"def2", "word3":"def3"}
+    return word_defs
+
+@route('/words')
+def words():
+    output = template('words', word_defs=wordsdict())
     return output
 
 @route('/login')
