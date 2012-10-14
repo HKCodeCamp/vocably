@@ -1,0 +1,12 @@
+# Linux development environment
+Android SDK r20.0.3
+Eclipse Classic IDE 3.8.0
+Android Development Tools (ADT) Eclipse plugin with Android API 2.3.3 installed
+
+# included requirements (installed in project tree)
+Phonegap 2.1.0 (jar and js)
+jQuery 1.8.2 (js)
+jQuery Mobile  1.2.0 (js and css)
+ChildBrowser 3.0.4 (Phonegap plugin)
+javascript oauth samples from: https://github.com/liquidlabs/phonegap-oauth-google-api-mobile
+Google API's (remote js)
