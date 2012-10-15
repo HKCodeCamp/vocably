@@ -1,10 +1,8 @@
-#!/usr/bin/python2
 #
 # Utilities to calculate scores and fetch new words
 #
 
-import re
-import random, enchant
+import re, random, enchant, cPickle as pickle
 import database
 
 # global reference dictionary
@@ -19,6 +17,8 @@ def words_in_language():
     return len(reference_wordlist)
 def wordlist_filename():
     return "data/corpusrank.txt"
+def wordlist_dumpfilename():
+    return "data/reference_wordlist.dump"
 
 
 class Word:
@@ -29,6 +29,24 @@ class Word:
         self.rank = rank
         self.freq = freq
 
+def setup_reference_wordlist():
+    """
+    Load reference wordlist from dump if available, create it from textfile
+    otherwise.
+    """
+    try:
+        d = pickle.load(open(wordlist_dumpfilename(), 'rb'))
+        print "Loaded previously generated reference wordlist."
+        return d
+    except:
+        print "Couldn't load reference wordlist."
+
+    print "Creating reference wordlist from textfile. May take a while."
+    d = create_reference_wordlist(wordlist_filename())
+    print "Dumping reference wordlist to file."
+    pickle.dump(d, open(wordlist_dumpfilename(), 'wb'), protocol=2)
+
+    return d
 
 def create_reference_wordlist(fname):
     """
@@ -48,10 +66,16 @@ def create_reference_wordlist(fname):
         for i in d:
             d[i].freq /= count
 
+
     d = dict()
     en_dict = enchant.Dict("en_GB")
 
-    f = open(fname, 'r')
+    try:
+        f = open(fname, 'r')
+    except:
+        print "Can't find wordlist file to create dictionary."
+        return None
+
     for line in f.readlines():
         data = line.split()
         try:
@@ -157,7 +181,8 @@ def choose_words(email, nwords_to_send = 10):
         return unknown_words.pop(candidate)
 
     wordlist = [add_word() for i in range(nwords_to_send)]
-   
+  
+    # new score and add words to db
     database.store_user_words(email, wordlist)
     newscore = score(wordlist + userwords)
     database.set_score(email, newscore)
@@ -182,7 +207,7 @@ def initialize_module():
     global reference_wordlist
     global sorted_reference_wordlist
     
-    reference_wordlist = create_reference_wordlist(wordlist_filename())
+    reference_wordlist = setup_reference_wordlist()
     sorted_reference_wordlist = sorted(reference_wordlist,
             key=lambda x: reference_wordlist.get(x).freq, reverse=True)
 
