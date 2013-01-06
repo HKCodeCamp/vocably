@@ -1,0 +1,11 @@
+[uwsgi]
+uid = www-data
+gid = www-data
+master = 1
+workers = 2
+plugins = http, python
+virtualenv = /home/vocably/.virtualenvs/vocably/
+pythonpath = /home/vocably/Code/vocably/
+chdir = /home/vocably/Code/vocably/
+module = vocably:application   
+logto = /var/log/uwsgi/vocably.log

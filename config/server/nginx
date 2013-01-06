@@ -1,0 +1,20 @@
+server {
+        listen   80;
+
+        root /var/www/vocab.ly;
+        index index.html index.htm;
+
+        server_name localhost;
+
+        access_log /var/log/nginx/vocably.access.log;  
+        error_log /var/log/nginx/vocably.error.log;
+
+        location / {
+                include uwsgi_params;
+                uwsgi_pass 127.0.0.1:3031;
+        }
+
+        location ~ /\.ht {
+              deny all;
+        }
+}
