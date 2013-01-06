@@ -42,14 +42,17 @@ def fetch_mail():
     auth_str = "user=%s\1auth=Bearer %s\1\1" % (user_email(), credentials.access_token)
     imap_conn = imaplib.IMAP4_SSL('imap.gmail.com')
     imap_conn.authenticate('XOAUTH2', lambda x: auth_str)
-    imap_conn.select('INBOX') #"[Gmail]/Sent Mail"
+    imap_conn.select('[Gmail]/Sent Mail')
 
     # Pull email bodies
     resp, data = imap_conn.search(None, 'ALL')
+    fetch_ids = ','.join(data[0].split())
+    resp, data = imap_conn.fetch(fetch_ids, '(BODY[TEXT])')
+    
     email_text = ""
-    for num in data[0].split():
-        resp, body = imap_conn.fetch(num, '(BODY[TEXT])')
-        email_text += body[0][1]
+    for mail in data:
+        email_text += ' '.join(mail)
+
     return email_text
 
 def deauthorize():

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title></title>
+        <link rel="stylesheet" href="css/jquery.mobile-1.2.0.min.css" />
+        <link rel="stylesheet" href="css/vocably.css" />
+
+        <script type="text/javascript" charset="utf-8" src="js/jquery-1.8.2.min.js"></script>
+
+        <!-- js required after jquery but before jquerymobile -->
+        <script type="text/javascript">
+            $(document).bind("mobileinit", function() {
+                $.mobile.touchOverflowEnabled = true; // required
+                $.mobile.defaultPageTransition = 'none'; // better performance on Android
+                $.mobile.loadingMessageTextVisible = true; // show text message
+                $.mobile.buttonMarkup.hoverDelay = 20; // remove sluggishness - default 200
+            });
+        </script>
+
+        <script type="text/javascript" charset="utf-8" src="js/jquery.mobile-1.2.0.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/cordova-2.1.0.js"></script>
+        <script type="text/javascript" charset="utf-8" src="childbrowser.js"></script>
+
+        <script src="https://apis.google.com/js/client.js?onload=OnLoadCallback"></script>
+        <script type="text/javascript" charset="utf-8" src="js/liquid.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/helper/liquid.helper.oauth.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/model/liquid.model.tasks.js"></script>
+
+        <script type="text/javascript" chatset="utf-8" src="js/vocably_view.js"></script>
+
+    </head>
+
+    <body>
+        <!-- Home page start -->
+        <div data-role="page" id="page-unauthorized">
+            <div data-theme="a" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <h3> Vocably </h3>
+            </div> 
+            <div id="content" data-role="content">
+                <div style="width: 40px; height: 35px; text-align: center; position: relative;">
+                    <img src="images/monkey_sm.png" />
+                </div>
+                <div>
+                    <p>Vocably scores your vocabulary knowledge based on your Gmail sent mail. Only a list of vocabulary is saved. Ever.</p>
+                </div>
+                <div id="access-code" data-authcode="">
+                    <a href="#" id="auth-app" data-role="button" data-transition="none" data-theme="e" data-icon="check" data-iconpos="right">Login</a>
+                </div>
+            </div>
+ 
+            <div data-theme="a" data-role="footer" data-position="fixed" data-tap-toggle="false">
+            </div>    
+        </div><!--Home page end -->
+
+        <!-- Wordlist page -->
+        <div data-role="page" id="page-wordlist"> 
+            <div data-theme="a" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <h3></h3>
+                <a href="#" id="head-menu-refresh" data-role="button" data-icon="refresh" class="ui-btn-right refresh-list" data-theme="b">Refresh Daily Words</a>
+            </div> 
+
+            <div data-role="content">
+                <div data-role="collapsible-set" id="wordlist">
+                    <div data-role="collapsible" class="collapsible">
+                        <h3>word1</h3>
+                        <p>definition1</p>
+                    </div>
+                    <div data-role="collapsible" class="collapsible">
+                        <h3>word2</h3>
+                        <p>definition2</p>
+                    </div>
+                </div>
+             </div> 
+             
+            <div data-theme="a" data-role="footer" data-position="fixed" data-tap-toggle="false">
+            </div>                 
+        </div><!-- Logged in page -->
+
+        <script type="text/javascript" charset="utf-8" src="js/vocably.js"></script>
+    </body>
+</html>
+

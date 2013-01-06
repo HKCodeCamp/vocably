@@ -1,0 +1,25 @@
+look at vocably.js
+
+Need to uncomment most of the OAuth code and get the liquid OAuth js helpers working. 
+Look at the github link in the requirements.txt for more info on the OAuth helpers. 
+ChildBrowser is included in order to let the application handle the OAuth popup form.
+ChildBrowser can only be tested on a phone (emulated or real)
+
+Once authenticated and we have the Access Token, we are yet to decide what to do with it.
+
+We can:
+a. use token, download email and POST email to server.
+b. POST or put the token in the URL to server and let the server download the email.
+
+option B and sending it via the URL is currently the simplest. The server preferably receives the Access Token on each GET of .../words.json (so we know who the user is), and preferably over HTTPS (else we are giving sniffers access to our emails). 
+
+URL's and Google API keys/secrets need to be modified to correspond to the deployment environment. Testing needs several components to be setup:
+- All the Google OAuth keys, callback URLS etc.
+- emulated or real Android phone with a network connection.
+- server with the appropriate interfaces as described above.
+
+Happy testing!
+
+
+NB: To install the APK on a real phone, it needs to be signed. A vocably certificate was generated and it is included. Ask Vaughn for the password, but you should already know it. 
+
